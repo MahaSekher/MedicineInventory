@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:user_input_app/screens/home_page.dart';
 import 'screens/medicine_list_screen.dart';
 import 'providers/medicine_provider.dart';
 
@@ -16,7 +17,7 @@ class MedicineInventoryApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Medicine Inventory',
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: MedicineListScreen(),
+        home: HomePage(),
       ),
     );
   }

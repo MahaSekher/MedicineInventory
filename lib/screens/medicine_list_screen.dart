@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'add_medicine_screen.dart';
+import 'custom_drawer.dart';
 import 'edit_medicine_screen.dart';
 import '../providers/medicine_provider.dart';
 
@@ -10,8 +12,9 @@ class MedicineListScreen extends StatelessWidget {
     final medicines = context.watch<MedicineProvider>().medicines;
 
     return Scaffold(
+      drawer: CustomDrawer(),
       appBar: AppBar(
-        title: Text('Medicine Inventory'),
+        title: Text('Medicine list'),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
@@ -33,7 +36,8 @@ class MedicineListScreen extends StatelessWidget {
                 return ListTile(
                   title: Text(med.name),
                   subtitle: Text(
-                      'Type: ${med.type}, Expiry: ${med.expiryDate.toLocal()}'),
+                      'Type: ${med.type}, Expiry: ${
+                      DateFormat('dd/MM/yyyy HH:mm').format(med.expiryDate.toLocal())}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
