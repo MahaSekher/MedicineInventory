@@ -1,0 +1,16 @@
+Future<void> scheduleExpiryNotification(DateTime expiryDate, String medicineName) async {
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+    0,
+    'Medicine Expiry Alert',
+    'The medicine $medicineName is about to expire!',
+    expiryDate.subtract(Duration(days: 7)), // Notify a week before expiry
+    const NotificationDetails(
+      android: AndroidNotificationDetails('expiry_channel', 'Expiry Notifications'),
+    ),
+    androidAllowWhileIdle: true,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+  );
+}
