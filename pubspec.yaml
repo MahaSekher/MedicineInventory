@@ -13,6 +13,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   shared_preferences: ^2.0.6
+  provider: ^6.0.3
+  intl: ^0.17.0
   #flutter_local_notifications: ^10.0.0
 
 dev_dependencies:

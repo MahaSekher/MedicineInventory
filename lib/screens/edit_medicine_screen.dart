@@ -112,7 +112,7 @@ class _EditMedicineScreenState extends State<EditMedicineScreen> {
                 children: [
                   Text(
                     _selectedDate == null
-                        ? 'No Date Chosen'
+                        ? 'Add expiry date'
                         : 'Expiry Date: ${_selectedDate!.toLocal()}',
                   ),
                   Spacer(),

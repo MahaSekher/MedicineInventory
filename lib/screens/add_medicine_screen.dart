@@ -17,6 +17,11 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
 
   void _submitForm(BuildContext context) {
     if (!_formKey.currentState!.validate() || _selectedDate == null) {
+      if (_selectedDate == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please choose an expiry date')),
+        );
+      }
       return;
     }
 
@@ -95,7 +100,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                 children: [
                   Text(
                     _selectedDate == null
-                        ? 'No Date Chosen'
+                        ? 'Add expiry date'
                         : 'Expiry Date: ${_selectedDate!.toLocal()}',
                   ),
                   Spacer(),
