@@ -1,23 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:user_input_app/screens/home_page.dart';
-import 'screens/medicine_list_screen.dart';
-import 'providers/medicine_provider.dart';
+import 'models/user_profile.dart';
+import 'widgets/user_profile_provider.dart';
+import 'screens/home_screen.dart';
 
 void main() {
-  runApp(MedicineInventoryApp());
+  runApp(MyApp());
 }
 
-class MedicineInventoryApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  final UserProfile _userProfile = UserProfile(name: 'Username', email: 'user@example.com');
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MedicineProvider(),
+    return UserProfileProvider(
+      userProfile: _userProfile,
+      onProfileUpdated: (updatedProfile) {
+        _userProfile.name = updatedProfile.name;
+        _userProfile.email = updatedProfile.email;
+        _userProfile.image = updatedProfile.image;
+      },
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Medicine Inventory',
-        theme: ThemeData(primarySwatch: Colors.blue),
-        home: HomePage(),
+        title: 'User Input App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: HomeScreen(),
       ),
     );
   }
