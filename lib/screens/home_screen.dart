@@ -1,15 +1,58 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_drawer.dart';
-import '../models/user_profile.dart';
-import '../models/persistence/appointment.dart';
-import '../models/persistence/medical_record.dart';
-import '../models/persistence/patient.dart';
 import '../models/database_helper.dart';
+import '../models/persistence/patient.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _patientNameController = TextEditingController();
+  final _dobController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+
+  // Function to save patient data
+  Future<void> _savePatient() async {
+    final patient = Patient(
+      name: _patientNameController.text,
+      dob: _dobController.text,
+      gender: 'Male', // Example: hardcoded, you can extend this to input
+      phoneNumber: _phoneController.text,
+      address: _addressController.text,
+    );
+
+    await DatabaseHelper.instance.insertPatient(patient.toMap());
+    _clearFields();
+    setState(() {});
+  }
+
+  // Clear input fields
+  void _clearFields() {
+    _patientNameController.clear();
+    _dobController.clear();
+    _phoneController.clear();
+    _addressController.clear();
+  }
+
+  // Function to fetch patients
+  Future<List<Patient>> _fetchPatients() async {
+    final List<Map<String, dynamic>> patientsData =
+    await DatabaseHelper.instance.getAllPatients();
+    return List.generate(patientsData.length, (i) {
+      return Patient(
+        id: patientsData[i]['id'],
+        name: patientsData[i]['name'],
+        dob: patientsData[i]['dob'],
+        gender: patientsData[i]['gender'],
+        phoneNumber: patientsData[i]['phone_number'],
+        address: patientsData[i]['address'],
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,66 +98,11 @@ class HomeScreen extends StatefulWidget {
               title: Text('New lab results available for John Doe'),
               leading: Icon(Icons.notification_important, color: Colors.red),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final _patientNameController = TextEditingController();
-  final _dobController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
-
-  // Function to save patient data
-  Future<void> _savePatient() async {
-    final patient = Patient(
-      name: _patientNameController.text,
-      dob: _dobController.text,
-      gender: 'Male', // Example: hardcoded, you can extend this to input
-      phoneNumber: _phoneController.text,
-      address: _addressController.text,
-    );
-
-    await DatabaseHelper.instance.insertPatient(patient.toMap());
-    _clearFields();
-    setState(() {});
-  }
-
-  // Clear input fields
-  void _clearFields() {
-    _patientNameController.clear();
-    _dobController.clear();
-    _phoneController.clear();
-    _addressController.clear();
-  }
-
-  // Function to fetch patients
-  Future<List<Patient>> _fetchPatients() async {
-    final List<Map<String, dynamic>> patientsData =
-        await DatabaseHelper.instance.getAllPatients();
-    return List.generate(patientsData.length, (i) {
-      return Patient(
-        id: patientsData[i]['id'],
-        name: patientsData[i]['name'],
-        dob: patientsData[i]['dob'],
-        gender: patientsData[i]['gender'],
-        phoneNumber: patientsData[i]['phone_number'],
-        address: patientsData[i]['address'],
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Electronic Medical Records')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
+            SizedBox(height: 16.0),
+            Text(
+              'Add New Patient',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             TextField(
                 controller: _patientNameController,
                 decoration: InputDecoration(labelText: 'Name')),

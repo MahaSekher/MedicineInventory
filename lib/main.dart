@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:user_input_app/screens/login_screen.dart';
+import 'package:user_input_app/themes/app_theme.dart';
 import 'models/user_profile.dart';
 import 'widgets/user_profile_provider.dart';
 import 'screens/home_screen.dart';
@@ -20,10 +22,8 @@ class MyApp extends StatelessWidget {
         _userProfile.image = updatedProfile.image;
       },
       child: MaterialApp(
-        title: 'User Input App',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
+        title: 'EMR App',
+        theme: AppTheme.lightTheme,// Optionally apply a dark theme
         home: HomeScreen(),
       ),
     );
