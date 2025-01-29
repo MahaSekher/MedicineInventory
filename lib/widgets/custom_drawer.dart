@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:user_input_app/screens/settings_screen.dart';
 import 'dart:io';
-import '../screens/notifications_screen.dart';
 import '../screens/patient_records_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/vital_signs_screen.dart';
