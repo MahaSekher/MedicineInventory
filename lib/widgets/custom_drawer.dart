@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:user_input_app/screens/settings_screen.dart';
 import 'dart:io';
+import '../screens/notifications_screen.dart';
+import '../screens/patient_records_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/vital_signs_screen.dart';
 import '../widgets/user_profile_provider.dart';
@@ -80,7 +83,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ListTile(
             leading: Icon(Icons.person),
             title: Text('Patient Records'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PatientRecordsScreen(),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.calendar_today),
@@ -98,14 +108,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
             onTap: () {},
           ),
           ListTile(
-            leading: Icon(Icons.notifications),
-            title: Text('Notifications'),
-            onTap: () {},
-          ),
-          ListTile(
             leading: Icon(Icons.settings),
             title: Text('Settings'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen(),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.account_circle),

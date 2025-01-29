@@ -6,21 +6,23 @@ class Patient {
   final String phoneNumber;
   final String address;
 
-  Patient(
-      {this.id,
-      required this.name,
-      required this.dob,
-      required this.gender,
-      required this.phoneNumber,
-      required this.address});
+  Patient({
+    this.id,
+    required this.name,
+    required this.dob,
+    required this.gender,
+    required this.phoneNumber,
+    required this.address,
+  });
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'name': name,
       'dob': dob,
       'gender': gender,
       'phone_number': phoneNumber,
-      'address': address
+      'address': address,
     };
   }
 }
