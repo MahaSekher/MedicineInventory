@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/rounded_button.dart';
-import 'signup_screen.dart';
+import 'package:user_input_app/screens/signup_screen.dart';
+import '../services/database_helper.dart';
+import '../models/persistence/users.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -8,65 +10,64 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  String _email = '';
-  String _password = '';
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  void _signIn() {
-    // Implement sign-in logic here
-  }
+  Future<void> _login() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
 
-  void _forgotPassword() {
-    // Implement forgot password logic here
+    final user = await DatabaseHelper.instance.getUser(email);
+
+    if (user != null && user.password == password) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+          settings: RouteSettings(arguments: email),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invalid email or password')));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
+      appBar: AppBar(title: Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (value) {
-                  _email = value;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                onChanged: (value) {
-                  _password = value;
-                },
-              ),
-              RoundedButton(
-                text: 'Sign In',
-                color: Colors.blue,
-                onPressed: _signIn,
-              ),
-              RoundedButton(
-                text: 'Sign Up',
-                color: Colors.green,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignUpScreen()),
-                  );
-                },
-              ),
-              TextButton(
-                onPressed: _forgotPassword,
-                child: Text('Forgot Password?'),
-              ),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _login,
+              child: Text('Login'),
+            ),
+            SizedBox(height: 20),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SignupScreen(),
+                  ),
+                );
+              },
+              child: Text('Don\'t have an account? Sign up here!'),
+            ),
+          ],
         ),
       ),
     );

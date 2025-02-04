@@ -1,68 +1,58 @@
 import 'package:flutter/material.dart';
-import '../widgets/rounded_button.dart';
+import '../services/database_helper.dart';
+import '../models/persistence/users.dart';
 
-class SignUpScreen extends StatefulWidget {
+class SignupScreen extends StatefulWidget {
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  _SignupScreenState createState() => _SignupScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
-  final _formKey = GlobalKey<FormState>();
-  String _name = '';
-  String _email = '';
-  String _password = '';
-  String _confirmPassword = '';
+class _SignupScreenState extends State<SignupScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  void _signUp() {
-    // Implement sign-up logic here
+  Future<void> _signup() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    // Check if user already exists
+    final existingUser = await DatabaseHelper.instance.getUser(email);
+
+    if (existingUser == null) {
+      final user = User(email: email, password: password);
+      await DatabaseHelper.instance.insertUser(user);
+      // Navigate to login screen
+      Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Email already exists. Please use a different email.')));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Sign Up'),
-      ),
+      appBar: AppBar(title: Text('Sign Up')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Name'),
-                onChanged: (value) {
-                  _name = value;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (value) {
-                  _email = value;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                onChanged: (value) {
-                  _password = value;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Confirm Password'),
-                obscureText: true,
-                onChanged: (value) {
-                  _confirmPassword = value;
-                },
-              ),
-              RoundedButton(
-                text: 'Sign Up',
-                color: Colors.green,
-                onPressed: _signUp,
-              ),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _signup,
+              child: Text('Sign Up'),
+            ),
+          ],
         ),
       ),
     );

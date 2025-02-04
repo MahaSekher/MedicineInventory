@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../models/user_profile.dart';
+import '../models/persistence/my_profile.dart';
 
 class UserProfileProvider extends InheritedWidget {
-  final UserProfile userProfile;
-  final ValueChanged<UserProfile> onProfileUpdated;
+  final MyProfile userProfile;
+  final ValueChanged<MyProfile> onProfileUpdated;
 
   UserProfileProvider({
     Key? key,
