@@ -1,42 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:user_input_app/screens/settings_screen.dart';
-import 'dart:io';
-import '../screens/patient_records_screen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/patient_records_screen.dart';
 import '../screens/vital_signs_screen.dart';
-import '../widgets/user_profile_provider.dart';
-import '../models/user_profile.dart';
+import '../screens/settings_screen.dart';
+import '../screens/login_screen.dart';
 
-class CustomDrawer extends StatefulWidget {
-  @override
-  _CustomDrawerState createState() => _CustomDrawerState();
-}
+class CustomDrawer extends StatelessWidget {
+  final String email;
 
-class _CustomDrawerState extends State<CustomDrawer> {
-  late UserProfile _userProfile;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final provider = UserProfileProvider.of(context);
-    _userProfile = provider?.userProfile ?? UserProfile(name: 'Username', email: 'user@example.com');
-  }
-
-  Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _userProfile.image = File(pickedFile.path);
-        _updateProfile();
-      });
-    }
-  }
-
-  void _updateProfile() {
-    UserProfileProvider.of(context)?.onProfileUpdated(_userProfile);
-  }
+  CustomDrawer({required this.email});
 
   @override
   Widget build(BuildContext context) {
@@ -45,33 +17,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           UserAccountsDrawerHeader(
-            accountName: Text(_userProfile.name),
-            accountEmail: Text(_userProfile.email),
+            accountName: Text('User Name'),
+            accountEmail: Text(email),
             currentAccountPicture: GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                width: 80.0,
-                height: 80.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.grey,
-                    width: 2.0,
-                  ),
-                ),
-                child: CircleAvatar(
-                  radius: 38.0,
-                  backgroundImage: _userProfile.image == null
-                      ? AssetImage('assets/user_logo.png')
-                      : FileImage(_userProfile.image!) as ImageProvider,
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Icon(
-                      Icons.camera_alt,
-                      color: Colors.grey,
-                      size: 20.0,
-                    ),
-                  ),
+              onTap: () {
+                // Handle profile image change
+              },
+              child: CircleAvatar(
+                backgroundColor: Colors.grey,
+                child: Icon(
+                  Icons.person,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -94,17 +50,30 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ListTile(
             leading: Icon(Icons.calendar_today),
             title: Text('Appointments'),
-            onTap: () {},
+            onTap: () {
+              // Navigate to appointments screen
+            },
           ),
           ListTile(
             leading: Icon(Icons.medical_services),
             title: Text('Prescriptions'),
-            onTap: () {},
+            onTap: () {
+              // Navigate to prescriptions screen
+            },
           ),
           ListTile(
             leading: Icon(Icons.receipt),
             title: Text('Billing'),
-            onTap: () {},
+            onTap: () {
+              // Navigate to billing screen
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.notifications),
+            title: Text('Notifications'),
+            onTap: () {
+              // Navigate to notifications screen
+            },
           ),
           ListTile(
             leading: Icon(Icons.settings),
@@ -125,13 +94,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProfileScreen(
-                    onProfileUpdated: (userProfile) {
-                      setState(() {
-                        _userProfile = userProfile;
-                      });
-                    },
-                  ),
+                  builder: (context) => ProfileScreen(),
+                  settings: RouteSettings(arguments: email), // Pass the email to ProfileScreen
                 ),
               );
             },
@@ -144,6 +108,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => VitalSignsScreen(),
+                ),
+              );
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text('Logout'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginScreen(),
                 ),
               );
             },
