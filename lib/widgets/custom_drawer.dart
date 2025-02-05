@@ -6,9 +6,10 @@ import '../screens/settings_screen.dart';
 import '../screens/login_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
+  final String name;
   final String email;
 
-  CustomDrawer({required this.email});
+  CustomDrawer({required this.email, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class CustomDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           UserAccountsDrawerHeader(
-            accountName: Text('User Name'),
+            accountName: Text(name),
             accountEmail: Text(email),
             currentAccountPicture: GestureDetector(
               onTap: () {
@@ -83,6 +84,7 @@ class CustomDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => SettingsScreen(),
+                  settings: RouteSettings(arguments: email),
                 ),
               );
             },
@@ -108,6 +110,7 @@ class CustomDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => VitalSignsScreen(),
+                  settings: RouteSettings(arguments: email), // Pass the email to VitalSigns
                 ),
               );
             },

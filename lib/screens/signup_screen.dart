@@ -8,10 +8,12 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   Future<void> _signup() async {
+    final name = _nameController.text;
     final email = _emailController.text;
     final password = _passwordController.text;
 
@@ -19,7 +21,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final existingUser = await DatabaseHelper.instance.getUser(email);
 
     if (existingUser == null) {
-      final user = User(email: email, password: password);
+      final user = User(name: name, email: email, password: password);
       await DatabaseHelper.instance.insertUser(user);
       // Navigate to login screen
       Navigator.pushReplacementNamed(context, '/login');
@@ -38,6 +40,10 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(labelText: 'Name'),
+            ),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(labelText: 'Email'),

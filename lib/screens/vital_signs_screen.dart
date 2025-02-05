@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/persistence/vital_signs.dart';
+import '../services/database_helper.dart';
 
 class VitalSignsScreen extends StatefulWidget {
   @override
@@ -6,106 +8,136 @@ class VitalSignsScreen extends StatefulWidget {
 }
 
 class _VitalSignsScreenState extends State<VitalSignsScreen> {
-  final _formKey = GlobalKey<FormState>();
-  DateTime _selectedDate = DateTime.now();
+  List<VitalSigns> _vitalSignsList = [];
+  final _dateController = TextEditingController();
+  final _timeController = TextEditingController();
+  final _bloodPressureController = TextEditingController();
+  final _heartRateController = TextEditingController();
+  final _respiratoryRateController = TextEditingController();
+  final _temperatureController = TextEditingController();
+  String? _emailError;
+  ScaffoldMessengerState? _scaffoldMessengerState;
 
-  String _bloodPressure = '';
-  String _heartRate = '';
-  String _temperature = '';
-  String _respiratoryRate = '';
-  String _prePrandialBloodGlucose = '';
-  String _postPrandialBloodGlucose = '';
-  String _randomBloodSugar = '';
-  String _weight = '';
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scaffoldMessengerState = ScaffoldMessenger.of(context);
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != _selectedDate) {
+    final String? email = ModalRoute.of(context)?.settings.arguments as String?;
+
+    if (email != null) {
+      _loadVitalSigns(email);
+    } else {
+      // Set error message if email is null
       setState(() {
-        _selectedDate = picked;
+        _emailError = 'Email not found. Please log in again.';
       });
     }
   }
 
+  Future<void> _loadVitalSigns(String email) async {
+    final vitalSigns = await DatabaseHelper.instance.getVitalSigns(email);
+
+    setState(() {
+      _vitalSignsList = vitalSigns;
+    });
+  }
+
+  Future<void> _addVitalSign(String email) async {
+    final newVitalSign = VitalSigns(
+      email: email,
+      date: _dateController.text,
+      time: _timeController.text,
+      bloodPressure: _bloodPressureController.text,
+      heartRate: int.tryParse(_heartRateController.text) ?? 0,
+      respiratoryRate: int.tryParse(_respiratoryRateController.text) ?? 0,
+      temperature: double.tryParse(_temperatureController.text) ?? 0.0,
+    );
+
+    await DatabaseHelper.instance.insertVitalSign(newVitalSign);
+    _loadVitalSigns(email);
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    _timeController.dispose();
+    _bloodPressureController.dispose();
+    _heartRateController.dispose();
+    _respiratoryRateController.dispose();
+    _temperatureController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final String? email = ModalRoute.of(context)?.settings.arguments as String?;
+
+    if (email == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Vital Signs'),
+        ),
+        body: Center(
+          child: Text('Email not found. Please log in again.'),
+        ),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(title: Text('Vital Signs')),
+      appBar: AppBar(
+        title: Text('Vital Signs'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              ListTile(
-                title: Text("Date: ${_selectedDate.toLocal()}".split(' ')[0]),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () => _selectDate(context),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Blood Pressure'),
-                onChanged: (value) => setState(() {
-                  _bloodPressure = value;
-                }),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Heart Rate'),
-                onChanged: (value) => setState(() {
-                  _heartRate = value;
-                }),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Temperature'),
-                onChanged: (value) => setState(() {
-                  _temperature = value;
-                }),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Respiratory Rate'),
-                onChanged: (value) => setState(() {
-                  _respiratoryRate = value;
-                }),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Blood Glucose Level (Pre Prandial)'),
-                onChanged: (value) => setState(() {
-                  _prePrandialBloodGlucose = value;
-                }),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Blood Glucose Level (Post Prandial)'),
-                onChanged: (value) => setState(() {
-                  _postPrandialBloodGlucose = value;
-                }),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Random Blood Sugar'),
-                onChanged: (value) => setState(() {
-                  _randomBloodSugar = value;
-                }),
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Weight (kg)'),
-                onChanged: (value) => setState(() {
-                  _weight = value;
-                }),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    // Save vital signs data logic here
-                  }
+        child: Column(
+          children: [
+            TextField(
+              controller: _dateController,
+              decoration: InputDecoration(labelText: 'Date'),
+            ),
+            TextField(
+              controller: _timeController,
+              decoration: InputDecoration(labelText: 'Time'),
+            ),
+            TextField(
+              controller: _bloodPressureController,
+              decoration: InputDecoration(labelText: 'Blood Pressure'),
+            ),
+            TextField(
+              controller: _heartRateController,
+              decoration: InputDecoration(labelText: 'Heart Rate'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: _respiratoryRateController,
+              decoration: InputDecoration(labelText: 'Respiratory Rate'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: _temperatureController,
+              decoration: InputDecoration(labelText: 'Temperature'),
+              keyboardType: TextInputType.number,
+            ),
+            ElevatedButton(
+              onPressed: () => _addVitalSign(email),
+              child: Text('Add Vital Sign'),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _vitalSignsList.length,
+                itemBuilder: (context, index) {
+                  final vitalSign = _vitalSignsList[index];
+                  return ListTile(
+                    title: Text('${vitalSign.date} - ${vitalSign.time}'),
+                    subtitle: Text(
+                      'BP: ${vitalSign.bloodPressure}, HR: ${vitalSign.heartRate}, RR: ${vitalSign.respiratoryRate}, Temp: ${vitalSign.temperature}',
+                    ),
+                  );
                 },
-                child: Text('Save'),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
